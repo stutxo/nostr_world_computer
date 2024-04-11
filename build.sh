@@ -14,6 +14,11 @@ wasm-strip target/wasm32-unknown-unknown/release/world_computer.wasm
 echo "Optimizing WASM file..."
 wasm-opt -o target/wasm32-unknown-unknown/release/world_computer.wasm -Oz target/wasm32-unknown-unknown/release/world_computer.wasm
 
+# Convert WASM file to PNG image
+echo "Converting WASM file to PNG image..."
+wasm_to_png target/wasm32-unknown-unknown/release/world_computer.wasm
+
+
 # Output the file size
 
 ls -lh target/wasm32-unknown-unknown/release/world_computer.wasm | awk '{print "\033[0;95mwasm size: " $5 "\033[0m"}'
