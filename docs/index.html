@@ -5,38 +5,30 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>the world computer</title>
+    <title>The World Computer</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             background-color: #f0f0f0;
         }
 
-
-        @media (min-width: 510px) {
-            #canvas {
-                width: 510px;
-                height: 510px;
-                max-width: 100% !important;
-                height: auto !important;
-            }
-        }
-
         #canvas {
-            max-width: 100% !important;
-            height: auto !important;
+            width: auto;
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
 
 <body>
-
     <canvas id="canvas"></canvas>
+    <div id="output">Loading...</div>
 
     <script src="https://supertestnet.github.io/nostr-image-host/nostr_image_host.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/6502/sha256@main/sha256.js"></script>
@@ -65,17 +57,15 @@
             });
         }
 
-
         let importObject = {
             imports: {
                 imported_func: function (arg) {
-                    document.getElementById('output').textContent += arg;
+                    console.log(arg);
                 }
             }
         };
 
         async function loadWasm() {
-
             try {
                 var wasm_string = await fetchNostrImage();
                 console.log(wasm_string);
@@ -84,13 +74,13 @@
                 const { exports: wasm } = wasmModule.instance;;
 
                 let world_computer = wasm.world_computer();
-                console.log(`The world computer returns: ${world_computer}`);
+                document.getElementById('output').textContent = `The world computer returns: ${world_computer}`;
 
                 console.log('WASM module loaded successfully');
 
             } catch (error) {
                 console.error('Error loading WASM module:', error);
-                alert('Error loading WASM module, see console for details');
+                document.getElementById('output').textContent = 'Error loading WASM module, see console for details';
             }
         }
 
