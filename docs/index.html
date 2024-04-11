@@ -68,7 +68,6 @@
         async function loadWasm() {
             try {
                 var wasm_string = await fetchNostrImage();
-                console.log(wasm_string);
                 const wasmBytes = await decode_wasm_png(wasm_string);
                 const wasmModule = await WebAssembly.instantiate(wasmBytes, importObject);
                 const { exports: wasm } = wasmModule.instance;;
