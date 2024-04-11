@@ -22,4 +22,5 @@ wasm_to_png target/wasm32-unknown-unknown/release/world_computer.wasm
 # Output the file size
 
 ls -lh target/wasm32-unknown-unknown/release/world_computer.wasm | awk '{print "\033[0;95mwasm size: " $5 "\033[0m"}'
+ls -lh target/wasm32-unknown-unknown/release/world_computer.png | awk '{print "\033[0;80mpng size: " $5 "\033[0m"}'
 ls -lh docs/index.html | awk '{print "\033[0;91mindex.html size: " $5 "\033[0m"}'
