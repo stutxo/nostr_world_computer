@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>the world computer</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+
+        @media (min-width: 510px) {
+            #canvas {
+                width: 510px;
+                height: 510px;
+                max-width: 100% !important;
+                height: auto !important;
+            }
+        }
+
+        #canvas {
+            max-width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <script src="https://supertestnet.github.io/nostr-image-host/nostr_image_host.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/6502/sha256@main/sha256.js"></script>
+    <script src="https://bundle.run/noble-secp256k1@1.2.14"></script>
+    <script src="https://bundle.run/bech32@2.0.0"></script>
+
+    <script>
+        async function fetchNostrImage() {
+            var image_id = "nimg13pdn3e5xtxzrc687zlqhz37hxk8n6tw2429nejexpcpnnm2tw25hwumn8ghj7un9d3shjtnyv9kh2uewd9hjq0l266r";
+            var base64 = await nostr_image_host.downloadFromNostr(image_id);
+            return base64
+        }
+
+        function decode_wasm_png(src) {
+            const img = new Image();
+            const ctx = document.createElement('canvas').getContext('2d');
+            img.src = src;
+            return img.decode().then(() => {
+                // Draw image to canvas
+                ctx.width = img.width;
+                ctx.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                // Retrieve RGBA data
+                let data = ctx.getImageData(0, 0, img.width, img.height).data;
+                // Only return R channel (identical to G and B channels)
+                data = data.filter((_, idx) => { return idx % 4 === 0 });
+                // Extract byte count from first 4 bytes (32-bit, unsigned, little endian)
+                const length = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24);
+                // Return WASM binary
+                return data.slice(4, length + 4).buffer;
+            });
+        }
+
+
+        let importObject = {
+            imports: {
+                imported_func: function (arg) {
+                    document.getElementById('output').textContent += arg;
+                }
+            }
+        };
+
+        async function loadWasm() {
+
+            try {
+                var wasm_string = await fetchNostrImage();
+                console.log(wasm_string);
+                const wasmBytes = await decode_wasm_png(wasm_string);
+                const wasmModule = await WebAssembly.instantiate(wasmBytes, importObject);
+                const { exports: wasm } = wasmModule.instance;;
+
+                let world_computer = wasm.world_computer();
+                console.log(`The world ${world_computer}`);
+
+                console.log('WASM module loaded successfully');
+
+            } catch (error) {
+                console.error('Error loading WASM module:', error);
+                alert('Error loading WASM module, see console for details');
+            }
+        }
+
+        loadWasm();
+
+    </script>
+</body>
+
+</html>
